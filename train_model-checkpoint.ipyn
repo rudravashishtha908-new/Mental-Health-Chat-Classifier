@@ -1,0 +1,1168 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "id": "fc652291",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>text</th>\n",
+       "      <th>label</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>I feel so hopeless</td>\n",
+       "      <td>depression</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>It’s so quiet here</td>\n",
+       "      <td>lonely</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>I'm tired of everything</td>\n",
+       "      <td>depression</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Everything hurts</td>\n",
+       "      <td>depression</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>I feel so hopeless</td>\n",
+       "      <td>depression</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                      text       label\n",
+       "0       I feel so hopeless  depression\n",
+       "1       It’s so quiet here      lonely\n",
+       "2  I'm tired of everything  depression\n",
+       "3         Everything hurts  depression\n",
+       "4       I feel so hopeless  depression"
+      ]
+     },
+     "execution_count": 17,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df = pd.read_csv(\"final_mental_health_dataset.csv\")\n",
+    "df.head()\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "id": "f157b006",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[nltk_data] Downloading package stopwords to\n",
+      "[nltk_data]     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]   Package stopwords is already up-to-date!\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>text</th>\n",
+       "      <th>clean_text</th>\n",
+       "      <th>label</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>I feel so empty and hopeless.</td>\n",
+       "      <td>feel empty hopeless</td>\n",
+       "      <td>depression</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>I've been anxious about everything lately.</td>\n",
+       "      <td>ive anxious everything lately</td>\n",
+       "      <td>anxiety</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>I need someone to talk to.</td>\n",
+       "      <td>need someone talk</td>\n",
+       "      <td>support</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>I'm feeling pretty good today!</td>\n",
+       "      <td>im feeling pretty good today</td>\n",
+       "      <td>happy</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Just want to disappear sometimes.</td>\n",
+       "      <td>want disappear sometimes</td>\n",
+       "      <td>depression</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                                         text                     clean_text  \\\n",
+       "0               I feel so empty and hopeless.            feel empty hopeless   \n",
+       "1  I've been anxious about everything lately.  ive anxious everything lately   \n",
+       "2                  I need someone to talk to.              need someone talk   \n",
+       "3              I'm feeling pretty good today!   im feeling pretty good today   \n",
+       "4           Just want to disappear sometimes.       want disappear sometimes   \n",
+       "\n",
+       "        label  \n",
+       "0  depression  \n",
+       "1     anxiety  \n",
+       "2     support  \n",
+       "3       happy  \n",
+       "4  depression  "
+      ]
+     },
+     "execution_count": 18,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "import pandas as pd\n",
+    "import string\n",
+    "import re\n",
+    "import nltk\n",
+    "from nltk.corpus import stopwords\n",
+    "\n",
+    "nltk.download('stopwords')\n",
+    "stop_words = set(stopwords.words('english'))\n",
+    "\n",
+    "# Load dataset\n",
+    "df = pd.read_csv(\"mental_health.csv\")\n",
+    "\n",
+    "# Lowercase, remove punctuation, stopwords, etc.\n",
+    "def clean_text(text):\n",
+    "    text = text.lower()\n",
+    "    text = re.sub(r\"http\\S+|www\\S+|https\\S+\", '', text, flags=re.MULTILINE)  # remove links\n",
+    "    text = re.sub(r'\\@w+|\\#','', text)  # remove @ and hashtags\n",
+    "    text = re.sub(r'[^A-Za-z\\s]', '', text)  # remove special chars\n",
+    "    tokens = text.split()\n",
+    "    filtered_words = [word for word in tokens if word not in stop_words]\n",
+    "    return \" \".join(filtered_words)\n",
+    "\n",
+    "df['clean_text'] = df['text'].apply(clean_text)\n",
+    "df[['text', 'clean_text', 'label']].head()\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "id": "ced5831b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.preprocessing import LabelEncoder\n",
+    "\n",
+    "le = LabelEncoder()\n",
+    "df['label_encoded'] = le.fit_transform(df['label'])\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "id": "ee8f62d0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.model_selection import train_test_split\n",
+    "\n",
+    "X = df['clean_text']\n",
+    "y = df['label_encoded']\n",
+    "\n",
+    "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "id": "11b7ca64",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.feature_extraction.text import TfidfVectorizer\n",
+    "\n",
+    "vectorizer = TfidfVectorizer()\n",
+    "X_train_vec = vectorizer.fit_transform(X_train)\n",
+    "X_test_vec = vectorizer.transform(X_test)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "id": "4eafae24",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "              precision    recall  f1-score   support\n",
+      "\n",
+      "           0       0.00      0.00      0.00         1\n",
+      "           1       0.00      0.00      0.00         0\n",
+      "           2       1.00      1.00      1.00         1\n",
+      "\n",
+      "    accuracy                           0.50         2\n",
+      "   macro avg       0.33      0.33      0.33         2\n",
+      "weighted avg       0.50      0.50      0.50         2\n",
+      "\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "C:\\Users\\user\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\sklearn\\metrics\\_classification.py:1344: UndefinedMetricWarning: Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.\n",
+      "  _warn_prf(average, modifier, msg_start, len(result))\n",
+      "C:\\Users\\user\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\sklearn\\metrics\\_classification.py:1344: UndefinedMetricWarning: Recall and F-score are ill-defined and being set to 0.0 in labels with no true samples. Use `zero_division` parameter to control this behavior.\n",
+      "  _warn_prf(average, modifier, msg_start, len(result))\n",
+      "C:\\Users\\user\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\sklearn\\metrics\\_classification.py:1344: UndefinedMetricWarning: Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.\n",
+      "  _warn_prf(average, modifier, msg_start, len(result))\n",
+      "C:\\Users\\user\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\sklearn\\metrics\\_classification.py:1344: UndefinedMetricWarning: Recall and F-score are ill-defined and being set to 0.0 in labels with no true samples. Use `zero_division` parameter to control this behavior.\n",
+      "  _warn_prf(average, modifier, msg_start, len(result))\n",
+      "C:\\Users\\user\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\sklearn\\metrics\\_classification.py:1344: UndefinedMetricWarning: Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.\n",
+      "  _warn_prf(average, modifier, msg_start, len(result))\n",
+      "C:\\Users\\user\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\sklearn\\metrics\\_classification.py:1344: UndefinedMetricWarning: Recall and F-score are ill-defined and being set to 0.0 in labels with no true samples. Use `zero_division` parameter to control this behavior.\n",
+      "  _warn_prf(average, modifier, msg_start, len(result))\n"
+     ]
+    }
+   ],
+   "source": [
+    "from sklearn.linear_model import LogisticRegression\n",
+    "from sklearn.metrics import classification_report\n",
+    "\n",
+    "model = LogisticRegression()\n",
+    "model.fit(X_train_vec, y_train)\n",
+    "\n",
+    "y_pred = model.predict(X_test_vec)\n",
+    "print(classification_report(y_test, y_pred))\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "9f23afda",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "['label_encoder.pkl']"
+      ]
+     },
+     "execution_count": 23,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "import joblib\n",
+    "\n",
+    "joblib.dump(model, 'mental_model.pkl')\n",
+    "joblib.dump(vectorizer, 'mental_vectorizer.pkl')\n",
+    "joblib.dump(le, 'label_encoder.pkl')  # ye bhi zaroori hai\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "id": "156ab958",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      " * Serving Flask app '__main__'\n",
+      " * Debug mode: on\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.\n",
+      " * Running on http://127.0.0.1:5000\n",
+      "Press CTRL+C to quit\n",
+      " * Restarting with stat\n"
+     ]
+    },
+    {
+     "ename": "SystemExit",
+     "evalue": "1",
+     "output_type": "error",
+     "traceback": [
+      "An exception has occurred, use %tb to see the full traceback.\n",
+      "\u001b[1;31mSystemExit\u001b[0m\u001b[1;31m:\u001b[0m 1\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "C:\\Users\\user\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\IPython\\core\\interactiveshell.py:3516: UserWarning: To exit: use 'exit', 'quit', or Ctrl-D.\n",
+      "  warn(\"To exit: use 'exit', 'quit', or Ctrl-D.\", stacklevel=1)\n"
+     ]
+    }
+   ],
+   "source": [
+    "from flask import Flask, render_template, request\n",
+    "import joblib\n",
+    "\n",
+    "app = Flask(__name__)\n",
+    "\n",
+    "# Load trained components\n",
+    "model = joblib.load('mental_model.pkl')\n",
+    "vectorizer = joblib.load('mental_vectorizer.pkl')\n",
+    "le = joblib.load('label_encoder.pkl')\n",
+    "\n",
+    "@app.route('/')\n",
+    "def home():\n",
+    "    return render_template('index.html')\n",
+    "\n",
+    "@app.route('/predict', methods=['POST'])\n",
+    "def predict():\n",
+    "    if request.method == 'POST':\n",
+    "        user_text = request.form['user_text']\n",
+    "        text_vector = vectorizer.transform([user_text])\n",
+    "        prediction = model.predict(text_vector)\n",
+    "        label = le.inverse_transform(prediction)[0]\n",
+    "        return render_template('result.html', text=user_text, prediction=label)\n",
+    "\n",
+    "if __name__ == '__main__':\n",
+    "    app.run(debug=True)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "id": "d746ee0b",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "PermissionError",
+     "evalue": "[Errno 13] Permission denied: 'C:\\\\Users\\\\user\\\\OneDrive\\\\Desktop\\\\mental_health_app\\\\mental_model.pkl'",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[1;31mPermissionError\u001b[0m                           Traceback (most recent call last)",
+      "Cell \u001b[1;32mIn[25], line 3\u001b[0m\n\u001b[0;32m      1\u001b[0m \u001b[38;5;28;01mimport\u001b[39;00m \u001b[38;5;21;01mjoblib\u001b[39;00m\n\u001b[1;32m----> 3\u001b[0m joblib\u001b[38;5;241m.\u001b[39mdump(model, \u001b[38;5;124mr\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mC:\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mUsers\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124muser\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mOneDrive\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mDesktop\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mmental_health_app\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mmental_model.pkl\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n\u001b[0;32m      4\u001b[0m joblib\u001b[38;5;241m.\u001b[39mdump(vectorizer, \u001b[38;5;124mr\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mC:\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mUsers\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124muser\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mOneDrive\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mDesktop\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mmental_health_app\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mmental_vectorizer.pkl\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n\u001b[0;32m      5\u001b[0m joblib\u001b[38;5;241m.\u001b[39mdump(le, \u001b[38;5;124mr\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mC:\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mUsers\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124muser\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mOneDrive\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mDesktop\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mmental_health_app\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mlabel_encoder.pkl\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n",
+      "File \u001b[1;32m~\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\joblib\\numpy_pickle.py:552\u001b[0m, in \u001b[0;36mdump\u001b[1;34m(value, filename, compress, protocol, cache_size)\u001b[0m\n\u001b[0;32m    550\u001b[0m         NumpyPickler(f, protocol\u001b[38;5;241m=\u001b[39mprotocol)\u001b[38;5;241m.\u001b[39mdump(value)\n\u001b[0;32m    551\u001b[0m \u001b[38;5;28;01melif\u001b[39;00m is_filename:\n\u001b[1;32m--> 552\u001b[0m     \u001b[38;5;28;01mwith\u001b[39;00m \u001b[38;5;28mopen\u001b[39m(filename, \u001b[38;5;124m'\u001b[39m\u001b[38;5;124mwb\u001b[39m\u001b[38;5;124m'\u001b[39m) \u001b[38;5;28;01mas\u001b[39;00m f:\n\u001b[0;32m    553\u001b[0m         NumpyPickler(f, protocol\u001b[38;5;241m=\u001b[39mprotocol)\u001b[38;5;241m.\u001b[39mdump(value)\n\u001b[0;32m    554\u001b[0m \u001b[38;5;28;01melse\u001b[39;00m:\n",
+      "\u001b[1;31mPermissionError\u001b[0m: [Errno 13] Permission denied: 'C:\\\\Users\\\\user\\\\OneDrive\\\\Desktop\\\\mental_health_app\\\\mental_model.pkl'"
+     ]
+    }
+   ],
+   "source": [
+    "import joblib\n",
+    "\n",
+    "joblib.dump(model, r\"C:\\Users\\user\\OneDrive\\Desktop\\mental_health_app\\mental_model.pkl\")\n",
+    "joblib.dump(vectorizer, r\"C:\\Users\\user\\OneDrive\\Desktop\\mental_health_app\\mental_vectorizer.pkl\")\n",
+    "joblib.dump(le, r\"C:\\Users\\user\\OneDrive\\Desktop\\mental_health_app\\label_encoder.pkl\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "id": "46c31627",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "['label_encoder.pkl']"
+      ]
+     },
+     "execution_count": 26,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "joblib.dump(model, \"mental_model.pkl\")\n",
+    "joblib.dump(vectorizer, \"mental_vectorizer.pkl\")\n",
+    "joblib.dump(le, \"label_encoder.pkl\")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "id": "061d33ed",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "FileNotFoundError",
+     "evalue": "[Errno 2] No such file or directory: 'C:\\\\Users\\\\user\\\\Documents\\\\mental_health_app\\\\mental_model.pkl'",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[1;31mFileNotFoundError\u001b[0m                         Traceback (most recent call last)",
+      "Cell \u001b[1;32mIn[27], line 1\u001b[0m\n\u001b[1;32m----> 1\u001b[0m model \u001b[38;5;241m=\u001b[39m joblib\u001b[38;5;241m.\u001b[39mload(\u001b[38;5;124mr\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mC:\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mUsers\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124muser\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mDocuments\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mmental_health_app\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mmental_model.pkl\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n\u001b[0;32m      2\u001b[0m vectorizer \u001b[38;5;241m=\u001b[39m joblib\u001b[38;5;241m.\u001b[39mload(\u001b[38;5;124mr\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mC:\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mUsers\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124muser\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mDocuments\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mmental_health_app\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mmental_vectorizer.pkl\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n\u001b[0;32m      3\u001b[0m le \u001b[38;5;241m=\u001b[39m joblib\u001b[38;5;241m.\u001b[39mload(\u001b[38;5;124mr\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mC:\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mUsers\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124muser\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mDocuments\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mmental_health_app\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mlabel_encoder.pkl\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n",
+      "File \u001b[1;32m~\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\joblib\\numpy_pickle.py:650\u001b[0m, in \u001b[0;36mload\u001b[1;34m(filename, mmap_mode)\u001b[0m\n\u001b[0;32m    648\u001b[0m         obj \u001b[38;5;241m=\u001b[39m _unpickle(fobj)\n\u001b[0;32m    649\u001b[0m \u001b[38;5;28;01melse\u001b[39;00m:\n\u001b[1;32m--> 650\u001b[0m     \u001b[38;5;28;01mwith\u001b[39;00m \u001b[38;5;28mopen\u001b[39m(filename, \u001b[38;5;124m'\u001b[39m\u001b[38;5;124mrb\u001b[39m\u001b[38;5;124m'\u001b[39m) \u001b[38;5;28;01mas\u001b[39;00m f:\n\u001b[0;32m    651\u001b[0m         \u001b[38;5;28;01mwith\u001b[39;00m _read_fileobject(f, filename, mmap_mode) \u001b[38;5;28;01mas\u001b[39;00m fobj:\n\u001b[0;32m    652\u001b[0m             \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28misinstance\u001b[39m(fobj, \u001b[38;5;28mstr\u001b[39m):\n\u001b[0;32m    653\u001b[0m                 \u001b[38;5;66;03m# if the returned file object is a string, this means we\u001b[39;00m\n\u001b[0;32m    654\u001b[0m                 \u001b[38;5;66;03m# try to load a pickle file generated with an version of\u001b[39;00m\n\u001b[0;32m    655\u001b[0m                 \u001b[38;5;66;03m# Joblib so we load it with joblib compatibility function.\u001b[39;00m\n",
+      "\u001b[1;31mFileNotFoundError\u001b[0m: [Errno 2] No such file or directory: 'C:\\\\Users\\\\user\\\\Documents\\\\mental_health_app\\\\mental_model.pkl'"
+     ]
+    }
+   ],
+   "source": [
+    "model = joblib.load(r\"C:\\Users\\user\\Documents\\mental_health_app\\mental_model.pkl\")\n",
+    "vectorizer = joblib.load(r\"C:\\Users\\user\\Documents\\mental_health_app\\mental_vectorizer.pkl\")\n",
+    "le = joblib.load(r\"C:\\Users\\user\\Documents\\mental_health_app\\label_encoder.pkl\")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "id": "de022a6c",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "FileNotFoundError",
+     "evalue": "[Errno 2] No such file or directory: 'C:\\\\Users\\\\user\\\\Desktop\\\\mental_health_app\\\\mental_model.pkl'",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[1;31mFileNotFoundError\u001b[0m                         Traceback (most recent call last)",
+      "Cell \u001b[1;32mIn[29], line 4\u001b[0m\n\u001b[0;32m      1\u001b[0m \u001b[38;5;28;01mimport\u001b[39;00m \u001b[38;5;21;01mjoblib\u001b[39;00m\n\u001b[0;32m      3\u001b[0m \u001b[38;5;66;03m# Model, vectorizer, aur label encoder ko save karo\u001b[39;00m\n\u001b[1;32m----> 4\u001b[0m joblib\u001b[38;5;241m.\u001b[39mdump(model, \u001b[38;5;124mr\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mC:\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mUsers\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124muser\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mDesktop\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mmental_health_app\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mmental_model.pkl\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n\u001b[0;32m      5\u001b[0m joblib\u001b[38;5;241m.\u001b[39mdump(vectorizer, \u001b[38;5;124mr\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mC:\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mUsers\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124muser\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mDesktop\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mmental_health_app\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mmental_vectorizer.pkl\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n\u001b[0;32m      6\u001b[0m joblib\u001b[38;5;241m.\u001b[39mdump(le, \u001b[38;5;124mr\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mC:\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mUsers\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124muser\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mDesktop\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mmental_health_app\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mlabel_encoder.pkl\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n",
+      "File \u001b[1;32m~\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\joblib\\numpy_pickle.py:552\u001b[0m, in \u001b[0;36mdump\u001b[1;34m(value, filename, compress, protocol, cache_size)\u001b[0m\n\u001b[0;32m    550\u001b[0m         NumpyPickler(f, protocol\u001b[38;5;241m=\u001b[39mprotocol)\u001b[38;5;241m.\u001b[39mdump(value)\n\u001b[0;32m    551\u001b[0m \u001b[38;5;28;01melif\u001b[39;00m is_filename:\n\u001b[1;32m--> 552\u001b[0m     \u001b[38;5;28;01mwith\u001b[39;00m \u001b[38;5;28mopen\u001b[39m(filename, \u001b[38;5;124m'\u001b[39m\u001b[38;5;124mwb\u001b[39m\u001b[38;5;124m'\u001b[39m) \u001b[38;5;28;01mas\u001b[39;00m f:\n\u001b[0;32m    553\u001b[0m         NumpyPickler(f, protocol\u001b[38;5;241m=\u001b[39mprotocol)\u001b[38;5;241m.\u001b[39mdump(value)\n\u001b[0;32m    554\u001b[0m \u001b[38;5;28;01melse\u001b[39;00m:\n",
+      "\u001b[1;31mFileNotFoundError\u001b[0m: [Errno 2] No such file or directory: 'C:\\\\Users\\\\user\\\\Desktop\\\\mental_health_app\\\\mental_model.pkl'"
+     ]
+    }
+   ],
+   "source": [
+    "import joblib\n",
+    "\n",
+    "# Model, vectorizer, aur label encoder ko save karo\n",
+    "joblib.dump(model, r\"C:\\Users\\user\\Desktop\\mental_health_app\\mental_model.pkl\")\n",
+    "joblib.dump(vectorizer, r\"C:\\Users\\user\\Desktop\\mental_health_app\\mental_vectorizer.pkl\")\n",
+    "joblib.dump(le, r\"C:\\Users\\user\\Desktop\\mental_health_app\\label_encoder.pkl\")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "id": "b0ca6b8d",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "['label_encoder.pkl']"
+      ]
+     },
+     "execution_count": 30,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "import joblib\n",
+    "\n",
+    "joblib.dump(model, \"mental_model.pkl\")\n",
+    "joblib.dump(vectorizer, \"mental_vectorizer.pkl\")\n",
+    "joblib.dump(le, \"label_encoder.pkl\")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "id": "23be5d17",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      " * Serving Flask app '__main__'\n",
+      " * Debug mode: on\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.\n",
+      " * Running on http://127.0.0.1:5000\n",
+      "Press CTRL+C to quit\n",
+      " * Restarting with stat\n"
+     ]
+    },
+    {
+     "ename": "SystemExit",
+     "evalue": "1",
+     "output_type": "error",
+     "traceback": [
+      "An exception has occurred, use %tb to see the full traceback.\n",
+      "\u001b[1;31mSystemExit\u001b[0m\u001b[1;31m:\u001b[0m 1\n"
+     ]
+    }
+   ],
+   "source": [
+    "from flask import Flask, render_template, request\n",
+    "import joblib\n",
+    "\n",
+    "app = Flask(__name__)\n",
+    "\n",
+    "model = joblib.load(\"mental_model.pkl\")\n",
+    "vectorizer = joblib.load(\"mental_vectorizer.pkl\")\n",
+    "le = joblib.load(\"label_encoder.pkl\")\n",
+    "\n",
+    "@app.route('/')\n",
+    "def home():\n",
+    "    return render_template('index.html')\n",
+    "\n",
+    "@app.route('/predict', methods=['POST'])\n",
+    "def predict():\n",
+    "    if request.method == 'POST':\n",
+    "        user_input = request.form['user_input']\n",
+    "        transformed_input = vectorizer.transform([user_input])\n",
+    "        pred = model.predict(transformed_input)\n",
+    "        label = le.inverse_transform(pred)[0]\n",
+    "        return render_template('result.html', prediction=label)\n",
+    "\n",
+    "if __name__ == '__main__':\n",
+    "    app.run(debug=True)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "id": "1eabcae6",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "['mental_model.pkl']"
+      ]
+     },
+     "execution_count": 32,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "import joblib\n",
+    "\n",
+    "joblib.dump(model, \"mental_model.pkl\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "id": "3fe43e14",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "['mental_vectorizer.pkl']"
+      ]
+     },
+     "execution_count": 33,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "joblib.dump(vectorizer, \"mental_vectorizer.pkl\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 34,
+   "id": "33cfa0db",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "['label_encoder.pkl']"
+      ]
+     },
+     "execution_count": 34,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "joblib.dump(le, \"label_encoder.pkl\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 35,
+   "id": "f2926f9a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.preprocessing import LabelEncoder\n",
+    "\n",
+    "le = LabelEncoder()\n",
+    "df['label'] = le.fit_transform(df['label'])  # Yeh line train ke time pe likhni hoti hai\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 36,
+   "id": "36b44d43",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      " * Serving Flask app '__main__'\n",
+      " * Debug mode: on\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.\n",
+      " * Running on http://127.0.0.1:5000\n",
+      "Press CTRL+C to quit\n",
+      " * Restarting with stat\n"
+     ]
+    },
+    {
+     "ename": "SystemExit",
+     "evalue": "1",
+     "output_type": "error",
+     "traceback": [
+      "An exception has occurred, use %tb to see the full traceback.\n",
+      "\u001b[1;31mSystemExit\u001b[0m\u001b[1;31m:\u001b[0m 1\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "C:\\Users\\user\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\IPython\\core\\interactiveshell.py:3516: UserWarning: To exit: use 'exit', 'quit', or Ctrl-D.\n",
+      "  warn(\"To exit: use 'exit', 'quit', or Ctrl-D.\", stacklevel=1)\n"
+     ]
+    }
+   ],
+   "source": [
+    "from flask import Flask, render_template, request\n",
+    "import joblib\n",
+    "\n",
+    "# Flask app bana\n",
+    "app = Flask(__name__)\n",
+    "\n",
+    "# Model, vectorizer aur label encoder load kar\n",
+    "model = joblib.load(\"mental_model.pkl\")\n",
+    "vectorizer = joblib.load(\"mental_vectorizer.pkl\")\n",
+    "le = joblib.load(\"label_encoder.pkl\")\n",
+    "\n",
+    "# Home route\n",
+    "@app.route('/')\n",
+    "def home():\n",
+    "    return render_template('index.html')\n",
+    "\n",
+    "# Predict route\n",
+    "@app.route('/predict', methods=['POST'])\n",
+    "def predict():\n",
+    "    if request.method == 'POST':\n",
+    "        message = request.form['message']\n",
+    "        data = vectorizer.transform([message])\n",
+    "        pred = model.predict(data)\n",
+    "        label = le.inverse_transform(pred)[0]\n",
+    "        return render_template('result.html', prediction=label)\n",
+    "\n",
+    "# Run app\n",
+    "if __name__ == '__main__':\n",
+    "    app.run(debug=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 37,
+   "id": "9469c6b0",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[nltk_data] Downloading package stopwords to\n",
+      "[nltk_data]     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]   Package stopwords is already up-to-date!\n",
+      "[nltk_data] Downloading package punkt to\n",
+      "[nltk_data]     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]   Unzipping tokenizers\\punkt.zip.\n",
+      "[nltk_data] Downloading package wordnet to\n",
+      "[nltk_data]     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]   Package wordnet is already up-to-date!\n"
+     ]
+    },
+    {
+     "ename": "LookupError",
+     "evalue": "\n**********************************************************************\n  Resource \u001b[93mpunkt_tab\u001b[0m not found.\n  Please use the NLTK Downloader to obtain the resource:\n\n  \u001b[31m>>> import nltk\n  >>> nltk.download('punkt_tab')\n  \u001b[0m\n  For more information see: https://www.nltk.org/data.html\n\n  Attempted to load \u001b[93mtokenizers/punkt_tab/english/\u001b[0m\n\n  Searched in:\n    - 'C:\\\\Users\\\\user/nltk_data'\n    - 'C:\\\\Users\\\\user\\\\miniconda3\\\\envs\\\\ML_Internship\\\\nltk_data'\n    - 'C:\\\\Users\\\\user\\\\miniconda3\\\\envs\\\\ML_Internship\\\\share\\\\nltk_data'\n    - 'C:\\\\Users\\\\user\\\\miniconda3\\\\envs\\\\ML_Internship\\\\lib\\\\nltk_data'\n    - 'C:\\\\Users\\\\user\\\\AppData\\\\Roaming\\\\nltk_data'\n    - 'C:\\\\nltk_data'\n    - 'D:\\\\nltk_data'\n    - 'E:\\\\nltk_data'\n**********************************************************************\n",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[1;31mLookupError\u001b[0m                               Traceback (most recent call last)",
+      "Cell \u001b[1;32mIn[37], line 33\u001b[0m\n\u001b[0;32m     30\u001b[0m     tokens \u001b[38;5;241m=\u001b[39m [lemmatizer\u001b[38;5;241m.\u001b[39mlemmatize(w) \u001b[38;5;28;01mfor\u001b[39;00m w \u001b[38;5;129;01min\u001b[39;00m tokens]\n\u001b[0;32m     31\u001b[0m     \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[38;5;124m\"\u001b[39m\u001b[38;5;124m \u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;241m.\u001b[39mjoin(tokens)\n\u001b[1;32m---> 33\u001b[0m df[\u001b[38;5;124m'\u001b[39m\u001b[38;5;124mcleaned\u001b[39m\u001b[38;5;124m'\u001b[39m] \u001b[38;5;241m=\u001b[39m df[\u001b[38;5;124m'\u001b[39m\u001b[38;5;124mtext\u001b[39m\u001b[38;5;124m'\u001b[39m]\u001b[38;5;241m.\u001b[39mapply(clean_text)\n\u001b[0;32m     35\u001b[0m \u001b[38;5;66;03m# Step 5: Encode labels\u001b[39;00m\n\u001b[0;32m     36\u001b[0m le \u001b[38;5;241m=\u001b[39m LabelEncoder()\n",
+      "File \u001b[1;32m~\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\pandas\\core\\series.py:4630\u001b[0m, in \u001b[0;36mSeries.apply\u001b[1;34m(self, func, convert_dtype, args, **kwargs)\u001b[0m\n\u001b[0;32m   4520\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m \u001b[38;5;21mapply\u001b[39m(\n\u001b[0;32m   4521\u001b[0m     \u001b[38;5;28mself\u001b[39m,\n\u001b[0;32m   4522\u001b[0m     func: AggFuncType,\n\u001b[1;32m   (...)\u001b[0m\n\u001b[0;32m   4525\u001b[0m     \u001b[38;5;241m*\u001b[39m\u001b[38;5;241m*\u001b[39mkwargs,\n\u001b[0;32m   4526\u001b[0m ) \u001b[38;5;241m-\u001b[39m\u001b[38;5;241m>\u001b[39m DataFrame \u001b[38;5;241m|\u001b[39m Series:\n\u001b[0;32m   4527\u001b[0m \u001b[38;5;250m    \u001b[39m\u001b[38;5;124;03m\"\"\"\u001b[39;00m\n\u001b[0;32m   4528\u001b[0m \u001b[38;5;124;03m    Invoke function on values of Series.\u001b[39;00m\n\u001b[0;32m   4529\u001b[0m \n\u001b[1;32m   (...)\u001b[0m\n\u001b[0;32m   4628\u001b[0m \u001b[38;5;124;03m    dtype: float64\u001b[39;00m\n\u001b[0;32m   4629\u001b[0m \u001b[38;5;124;03m    \"\"\"\u001b[39;00m\n\u001b[1;32m-> 4630\u001b[0m     \u001b[38;5;28;01mreturn\u001b[39;00m SeriesApply(\u001b[38;5;28mself\u001b[39m, func, convert_dtype, args, kwargs)\u001b[38;5;241m.\u001b[39mapply()\n",
+      "File \u001b[1;32m~\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\pandas\\core\\apply.py:1025\u001b[0m, in \u001b[0;36mSeriesApply.apply\u001b[1;34m(self)\u001b[0m\n\u001b[0;32m   1022\u001b[0m     \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mapply_str()\n\u001b[0;32m   1024\u001b[0m \u001b[38;5;66;03m# self.f is Callable\u001b[39;00m\n\u001b[1;32m-> 1025\u001b[0m \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mapply_standard()\n",
+      "File \u001b[1;32m~\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\pandas\\core\\apply.py:1076\u001b[0m, in \u001b[0;36mSeriesApply.apply_standard\u001b[1;34m(self)\u001b[0m\n\u001b[0;32m   1074\u001b[0m     \u001b[38;5;28;01melse\u001b[39;00m:\n\u001b[0;32m   1075\u001b[0m         values \u001b[38;5;241m=\u001b[39m obj\u001b[38;5;241m.\u001b[39mastype(\u001b[38;5;28mobject\u001b[39m)\u001b[38;5;241m.\u001b[39m_values\n\u001b[1;32m-> 1076\u001b[0m         mapped \u001b[38;5;241m=\u001b[39m lib\u001b[38;5;241m.\u001b[39mmap_infer(\n\u001b[0;32m   1077\u001b[0m             values,\n\u001b[0;32m   1078\u001b[0m             f,\n\u001b[0;32m   1079\u001b[0m             convert\u001b[38;5;241m=\u001b[39m\u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mconvert_dtype,\n\u001b[0;32m   1080\u001b[0m         )\n\u001b[0;32m   1082\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28mlen\u001b[39m(mapped) \u001b[38;5;129;01mand\u001b[39;00m \u001b[38;5;28misinstance\u001b[39m(mapped[\u001b[38;5;241m0\u001b[39m], ABCSeries):\n\u001b[0;32m   1083\u001b[0m     \u001b[38;5;66;03m# GH#43986 Need to do list(mapped) in order to get treated as nested\u001b[39;00m\n\u001b[0;32m   1084\u001b[0m     \u001b[38;5;66;03m#  See also GH#25959 regarding EA support\u001b[39;00m\n\u001b[0;32m   1085\u001b[0m     \u001b[38;5;28;01mreturn\u001b[39;00m obj\u001b[38;5;241m.\u001b[39m_constructor_expanddim(\u001b[38;5;28mlist\u001b[39m(mapped), index\u001b[38;5;241m=\u001b[39mobj\u001b[38;5;241m.\u001b[39mindex)\n",
+      "File \u001b[1;32m~\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\pandas\\_libs\\lib.pyx:2834\u001b[0m, in \u001b[0;36mpandas._libs.lib.map_infer\u001b[1;34m()\u001b[0m\n",
+      "Cell \u001b[1;32mIn[37], line 27\u001b[0m, in \u001b[0;36mclean_text\u001b[1;34m(text)\u001b[0m\n\u001b[0;32m     25\u001b[0m text \u001b[38;5;241m=\u001b[39m re\u001b[38;5;241m.\u001b[39msub(\u001b[38;5;124mr\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124m@\u001b[39m\u001b[38;5;124m\\\u001b[39m\u001b[38;5;124mw+\u001b[39m\u001b[38;5;124m\"\u001b[39m, \u001b[38;5;124m\"\u001b[39m\u001b[38;5;124m\"\u001b[39m, text)\n\u001b[0;32m     26\u001b[0m text \u001b[38;5;241m=\u001b[39m re\u001b[38;5;241m.\u001b[39msub(\u001b[38;5;124mr\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124m[^a-zA-Z]\u001b[39m\u001b[38;5;124m\"\u001b[39m, \u001b[38;5;124m\"\u001b[39m\u001b[38;5;124m \u001b[39m\u001b[38;5;124m\"\u001b[39m, text)\n\u001b[1;32m---> 27\u001b[0m tokens \u001b[38;5;241m=\u001b[39m nltk\u001b[38;5;241m.\u001b[39mword_tokenize(text)\n\u001b[0;32m     28\u001b[0m tokens \u001b[38;5;241m=\u001b[39m [w \u001b[38;5;28;01mfor\u001b[39;00m w \u001b[38;5;129;01min\u001b[39;00m tokens \u001b[38;5;28;01mif\u001b[39;00m w \u001b[38;5;129;01mnot\u001b[39;00m \u001b[38;5;129;01min\u001b[39;00m stopwords\u001b[38;5;241m.\u001b[39mwords(\u001b[38;5;124m'\u001b[39m\u001b[38;5;124menglish\u001b[39m\u001b[38;5;124m'\u001b[39m)]\n\u001b[0;32m     29\u001b[0m lemmatizer \u001b[38;5;241m=\u001b[39m WordNetLemmatizer()\n",
+      "File \u001b[1;32m~\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\nltk\\tokenize\\__init__.py:142\u001b[0m, in \u001b[0;36mword_tokenize\u001b[1;34m(text, language, preserve_line)\u001b[0m\n\u001b[0;32m    127\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m \u001b[38;5;21mword_tokenize\u001b[39m(text, language\u001b[38;5;241m=\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124menglish\u001b[39m\u001b[38;5;124m\"\u001b[39m, preserve_line\u001b[38;5;241m=\u001b[39m\u001b[38;5;28;01mFalse\u001b[39;00m):\n\u001b[0;32m    128\u001b[0m \u001b[38;5;250m    \u001b[39m\u001b[38;5;124;03m\"\"\"\u001b[39;00m\n\u001b[0;32m    129\u001b[0m \u001b[38;5;124;03m    Return a tokenized copy of *text*,\u001b[39;00m\n\u001b[0;32m    130\u001b[0m \u001b[38;5;124;03m    using NLTK's recommended word tokenizer\u001b[39;00m\n\u001b[1;32m   (...)\u001b[0m\n\u001b[0;32m    140\u001b[0m \u001b[38;5;124;03m    :type preserve_line: bool\u001b[39;00m\n\u001b[0;32m    141\u001b[0m \u001b[38;5;124;03m    \"\"\"\u001b[39;00m\n\u001b[1;32m--> 142\u001b[0m     sentences \u001b[38;5;241m=\u001b[39m [text] \u001b[38;5;28;01mif\u001b[39;00m preserve_line \u001b[38;5;28;01melse\u001b[39;00m sent_tokenize(text, language)\n\u001b[0;32m    143\u001b[0m     \u001b[38;5;28;01mreturn\u001b[39;00m [\n\u001b[0;32m    144\u001b[0m         token \u001b[38;5;28;01mfor\u001b[39;00m sent \u001b[38;5;129;01min\u001b[39;00m sentences \u001b[38;5;28;01mfor\u001b[39;00m token \u001b[38;5;129;01min\u001b[39;00m _treebank_word_tokenizer\u001b[38;5;241m.\u001b[39mtokenize(sent)\n\u001b[0;32m    145\u001b[0m     ]\n",
+      "File \u001b[1;32m~\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\nltk\\tokenize\\__init__.py:119\u001b[0m, in \u001b[0;36msent_tokenize\u001b[1;34m(text, language)\u001b[0m\n\u001b[0;32m    109\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m \u001b[38;5;21msent_tokenize\u001b[39m(text, language\u001b[38;5;241m=\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124menglish\u001b[39m\u001b[38;5;124m\"\u001b[39m):\n\u001b[0;32m    110\u001b[0m \u001b[38;5;250m    \u001b[39m\u001b[38;5;124;03m\"\"\"\u001b[39;00m\n\u001b[0;32m    111\u001b[0m \u001b[38;5;124;03m    Return a sentence-tokenized copy of *text*,\u001b[39;00m\n\u001b[0;32m    112\u001b[0m \u001b[38;5;124;03m    using NLTK's recommended sentence tokenizer\u001b[39;00m\n\u001b[1;32m   (...)\u001b[0m\n\u001b[0;32m    117\u001b[0m \u001b[38;5;124;03m    :param language: the model name in the Punkt corpus\u001b[39;00m\n\u001b[0;32m    118\u001b[0m \u001b[38;5;124;03m    \"\"\"\u001b[39;00m\n\u001b[1;32m--> 119\u001b[0m     tokenizer \u001b[38;5;241m=\u001b[39m _get_punkt_tokenizer(language)\n\u001b[0;32m    120\u001b[0m     \u001b[38;5;28;01mreturn\u001b[39;00m tokenizer\u001b[38;5;241m.\u001b[39mtokenize(text)\n",
+      "File \u001b[1;32m~\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\nltk\\tokenize\\__init__.py:105\u001b[0m, in \u001b[0;36m_get_punkt_tokenizer\u001b[1;34m(language)\u001b[0m\n\u001b[0;32m     96\u001b[0m \u001b[38;5;129m@functools\u001b[39m\u001b[38;5;241m.\u001b[39mlru_cache\n\u001b[0;32m     97\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m \u001b[38;5;21m_get_punkt_tokenizer\u001b[39m(language\u001b[38;5;241m=\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124menglish\u001b[39m\u001b[38;5;124m\"\u001b[39m):\n\u001b[0;32m     98\u001b[0m \u001b[38;5;250m    \u001b[39m\u001b[38;5;124;03m\"\"\"\u001b[39;00m\n\u001b[0;32m     99\u001b[0m \u001b[38;5;124;03m    A constructor for the PunktTokenizer that utilizes\u001b[39;00m\n\u001b[0;32m    100\u001b[0m \u001b[38;5;124;03m    a lru cache for performance.\u001b[39;00m\n\u001b[1;32m   (...)\u001b[0m\n\u001b[0;32m    103\u001b[0m \u001b[38;5;124;03m    :type language: str\u001b[39;00m\n\u001b[0;32m    104\u001b[0m \u001b[38;5;124;03m    \"\"\"\u001b[39;00m\n\u001b[1;32m--> 105\u001b[0m     \u001b[38;5;28;01mreturn\u001b[39;00m PunktTokenizer(language)\n",
+      "File \u001b[1;32m~\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\nltk\\tokenize\\punkt.py:1744\u001b[0m, in \u001b[0;36mPunktTokenizer.__init__\u001b[1;34m(self, lang)\u001b[0m\n\u001b[0;32m   1742\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m \u001b[38;5;21m__init__\u001b[39m(\u001b[38;5;28mself\u001b[39m, lang\u001b[38;5;241m=\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124menglish\u001b[39m\u001b[38;5;124m\"\u001b[39m):\n\u001b[0;32m   1743\u001b[0m     PunktSentenceTokenizer\u001b[38;5;241m.\u001b[39m\u001b[38;5;21m__init__\u001b[39m(\u001b[38;5;28mself\u001b[39m)\n\u001b[1;32m-> 1744\u001b[0m     \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mload_lang(lang)\n",
+      "File \u001b[1;32m~\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\nltk\\tokenize\\punkt.py:1749\u001b[0m, in \u001b[0;36mPunktTokenizer.load_lang\u001b[1;34m(self, lang)\u001b[0m\n\u001b[0;32m   1746\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m \u001b[38;5;21mload_lang\u001b[39m(\u001b[38;5;28mself\u001b[39m, lang\u001b[38;5;241m=\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124menglish\u001b[39m\u001b[38;5;124m\"\u001b[39m):\n\u001b[0;32m   1747\u001b[0m     \u001b[38;5;28;01mfrom\u001b[39;00m \u001b[38;5;21;01mnltk\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01mdata\u001b[39;00m \u001b[38;5;28;01mimport\u001b[39;00m find\n\u001b[1;32m-> 1749\u001b[0m     lang_dir \u001b[38;5;241m=\u001b[39m find(\u001b[38;5;124mf\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mtokenizers/punkt_tab/\u001b[39m\u001b[38;5;132;01m{\u001b[39;00mlang\u001b[38;5;132;01m}\u001b[39;00m\u001b[38;5;124m/\u001b[39m\u001b[38;5;124m\"\u001b[39m)\n\u001b[0;32m   1750\u001b[0m     \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_params \u001b[38;5;241m=\u001b[39m load_punkt_params(lang_dir)\n\u001b[0;32m   1751\u001b[0m     \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_lang \u001b[38;5;241m=\u001b[39m lang\n",
+      "File \u001b[1;32m~\\miniconda3\\envs\\ML_Internship\\Lib\\site-packages\\nltk\\data.py:579\u001b[0m, in \u001b[0;36mfind\u001b[1;34m(resource_name, paths)\u001b[0m\n\u001b[0;32m    577\u001b[0m sep \u001b[38;5;241m=\u001b[39m \u001b[38;5;124m\"\u001b[39m\u001b[38;5;124m*\u001b[39m\u001b[38;5;124m\"\u001b[39m \u001b[38;5;241m*\u001b[39m \u001b[38;5;241m70\u001b[39m\n\u001b[0;32m    578\u001b[0m resource_not_found \u001b[38;5;241m=\u001b[39m \u001b[38;5;124mf\u001b[39m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;130;01m\\n\u001b[39;00m\u001b[38;5;132;01m{\u001b[39;00msep\u001b[38;5;132;01m}\u001b[39;00m\u001b[38;5;130;01m\\n\u001b[39;00m\u001b[38;5;132;01m{\u001b[39;00mmsg\u001b[38;5;132;01m}\u001b[39;00m\u001b[38;5;130;01m\\n\u001b[39;00m\u001b[38;5;132;01m{\u001b[39;00msep\u001b[38;5;132;01m}\u001b[39;00m\u001b[38;5;130;01m\\n\u001b[39;00m\u001b[38;5;124m\"\u001b[39m\n\u001b[1;32m--> 579\u001b[0m \u001b[38;5;28;01mraise\u001b[39;00m \u001b[38;5;167;01mLookupError\u001b[39;00m(resource_not_found)\n",
+      "\u001b[1;31mLookupError\u001b[0m: \n**********************************************************************\n  Resource \u001b[93mpunkt_tab\u001b[0m not found.\n  Please use the NLTK Downloader to obtain the resource:\n\n  \u001b[31m>>> import nltk\n  >>> nltk.download('punkt_tab')\n  \u001b[0m\n  For more information see: https://www.nltk.org/data.html\n\n  Attempted to load \u001b[93mtokenizers/punkt_tab/english/\u001b[0m\n\n  Searched in:\n    - 'C:\\\\Users\\\\user/nltk_data'\n    - 'C:\\\\Users\\\\user\\\\miniconda3\\\\envs\\\\ML_Internship\\\\nltk_data'\n    - 'C:\\\\Users\\\\user\\\\miniconda3\\\\envs\\\\ML_Internship\\\\share\\\\nltk_data'\n    - 'C:\\\\Users\\\\user\\\\miniconda3\\\\envs\\\\ML_Internship\\\\lib\\\\nltk_data'\n    - 'C:\\\\Users\\\\user\\\\AppData\\\\Roaming\\\\nltk_data'\n    - 'C:\\\\nltk_data'\n    - 'D:\\\\nltk_data'\n    - 'E:\\\\nltk_data'\n**********************************************************************\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Step 1: Import libraries\n",
+    "import pandas as pd\n",
+    "import string\n",
+    "import re\n",
+    "import nltk\n",
+    "import joblib\n",
+    "from sklearn.feature_extraction.text import TfidfVectorizer\n",
+    "from sklearn.preprocessing import LabelEncoder\n",
+    "from sklearn.naive_bayes import MultinomialNB\n",
+    "\n",
+    "# Step 2: NLTK download\n",
+    "nltk.download('stopwords')\n",
+    "nltk.download('punkt')\n",
+    "nltk.download('wordnet')\n",
+    "from nltk.corpus import stopwords\n",
+    "from nltk.stem import WordNetLemmatizer\n",
+    "\n",
+    "# Step 3: Load dataset\n",
+    "df = pd.read_csv(\"final_mental_health_dataset.csv\")  # ya jo tera file naam ho\n",
+    "\n",
+    "# Step 4: Text cleaning function\n",
+    "def clean_text(text):\n",
+    "    text = text.lower()\n",
+    "    text = re.sub(r\"http\\S+\", \"\", text)\n",
+    "    text = re.sub(r\"@\\w+\", \"\", text)\n",
+    "    text = re.sub(r\"[^a-zA-Z]\", \" \", text)\n",
+    "    tokens = nltk.word_tokenize(text)\n",
+    "    tokens = [w for w in tokens if w not in stopwords.words('english')]\n",
+    "    lemmatizer = WordNetLemmatizer()\n",
+    "    tokens = [lemmatizer.lemmatize(w) for w in tokens]\n",
+    "    return \" \".join(tokens)\n",
+    "\n",
+    "df['cleaned'] = df['text'].apply(clean_text)\n",
+    "\n",
+    "# Step 5: Encode labels\n",
+    "le = LabelEncoder()\n",
+    "y = le.fit_transform(df['label'])\n",
+    "\n",
+    "# Step 6: Vectorization\n",
+    "vectorizer = TfidfVectorizer()\n",
+    "X = vectorizer.fit_transform(df['cleaned'])\n",
+    "\n",
+    "# Step 7: Train model\n",
+    "model = MultinomialNB()\n",
+    "model.fit(X, y)\n",
+    "\n",
+    "# Step 8: Save model, vectorizer, label encoder\n",
+    "joblib.dump(model, \"mental_model.pkl\")\n",
+    "joblib.dump(vectorizer, \"mental_vectorizer.pkl\")\n",
+    "joblib.dump(le, \"label_encoder.pkl\")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "8c97e37a",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[nltk_data] Downloading package omw-1.4 to\n",
+      "[nltk_data]     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]   Package omw-1.4 is already up-to-date!\n",
+      "[nltk_data] Downloading package wordnet to\n",
+      "[nltk_data]     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]   Package wordnet is already up-to-date!\n",
+      "[nltk_data] Downloading collection 'all'\n",
+      "[nltk_data]    | \n",
+      "[nltk_data]    | Downloading package abc to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\abc.zip.\n",
+      "[nltk_data]    | Downloading package alpino to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\alpino.zip.\n",
+      "[nltk_data]    | Downloading package averaged_perceptron_tagger to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping taggers\\averaged_perceptron_tagger.zip.\n",
+      "[nltk_data]    | Downloading package averaged_perceptron_tagger_eng to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping\n",
+      "[nltk_data]    |       taggers\\averaged_perceptron_tagger_eng.zip.\n",
+      "[nltk_data]    | Downloading package averaged_perceptron_tagger_ru to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping\n",
+      "[nltk_data]    |       taggers\\averaged_perceptron_tagger_ru.zip.\n",
+      "[nltk_data]    | Downloading package averaged_perceptron_tagger_rus to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping\n",
+      "[nltk_data]    |       taggers\\averaged_perceptron_tagger_rus.zip.\n",
+      "[nltk_data]    | Downloading package basque_grammars to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping grammars\\basque_grammars.zip.\n",
+      "[nltk_data]    | Downloading package bcp47 to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    | Downloading package biocreative_ppi to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\biocreative_ppi.zip.\n",
+      "[nltk_data]    | Downloading package bllip_wsj_no_aux to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping models\\bllip_wsj_no_aux.zip.\n",
+      "[nltk_data]    | Downloading package book_grammars to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping grammars\\book_grammars.zip.\n",
+      "[nltk_data]    | Downloading package brown to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\brown.zip.\n",
+      "[nltk_data]    | Downloading package brown_tei to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\brown_tei.zip.\n",
+      "[nltk_data]    | Downloading package cess_cat to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\cess_cat.zip.\n",
+      "[nltk_data]    | Downloading package cess_esp to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\cess_esp.zip.\n",
+      "[nltk_data]    | Downloading package chat80 to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\chat80.zip.\n",
+      "[nltk_data]    | Downloading package city_database to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\city_database.zip.\n",
+      "[nltk_data]    | Downloading package cmudict to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\cmudict.zip.\n",
+      "[nltk_data]    | Downloading package comparative_sentences to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\comparative_sentences.zip.\n",
+      "[nltk_data]    | Downloading package comtrans to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    | Downloading package conll2000 to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\conll2000.zip.\n",
+      "[nltk_data]    | Downloading package conll2002 to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\conll2002.zip.\n",
+      "[nltk_data]    | Downloading package conll2007 to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    | Downloading package crubadan to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\crubadan.zip.\n",
+      "[nltk_data]    | Downloading package dependency_treebank to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\dependency_treebank.zip.\n",
+      "[nltk_data]    | Downloading package dolch to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\dolch.zip.\n",
+      "[nltk_data]    | Downloading package english_wordnet to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\english_wordnet.zip.\n",
+      "[nltk_data]    | Downloading package europarl_raw to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\europarl_raw.zip.\n",
+      "[nltk_data]    | Downloading package extended_omw to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    | Downloading package floresta to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]    |   Unzipping corpora\\floresta.zip.\n",
+      "[nltk_data]    | Downloading package framenet_v15 to\n",
+      "[nltk_data]    |     C:\\Users\\user\\AppData\\Roaming\\nltk_data...\n"
+     ]
+    }
+   ],
+   "source": [
+    "import nltk\n",
+    "nltk.download('omw-1.4')\n",
+    "nltk.download('wordnet')\n",
+    "nltk.download('all')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 41,
+   "id": "71052c0f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import joblib"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 42,
+   "id": "de05a296",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "['label_encoder.pkl']"
+      ]
+     },
+     "execution_count": 42,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Save the trained model\n",
+    "joblib.dump(model, \"mental_model.pkl\")\n",
+    "\n",
+    "# Save the fitted vectorizer\n",
+    "joblib.dump(vectorizer, \"mental_vectorizer.pkl\")\n",
+    "\n",
+    "# Save the fitted label encoder\n",
+    "joblib.dump(le, \"label_encoder.pkl\")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 44,
+   "id": "1b1d89d3",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "['label_encoder.pkl']"
+      ]
+     },
+     "execution_count": 44,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "import joblib\n",
+    "\n",
+    "joblib.dump(model, \"mental_model.pkl\")\n",
+    "joblib.dump(vectorizer, \"mental_vectorizer.pkl\")\n",
+    "joblib.dump(le, \"label_encoder.pkl\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 46,
+   "id": "8e710e31",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<style>#sk-container-id-1 {color: black;background-color: white;}#sk-container-id-1 pre{padding: 0;}#sk-container-id-1 div.sk-toggleable {background-color: white;}#sk-container-id-1 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-1 label.sk-toggleable__label-arrow:before {content: \"▸\";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-1 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-1 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-1 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: \"▾\";}#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-1 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-1 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-1 div.sk-parallel-item::after {content: \"\";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-serial::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-1 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-1 div.sk-item {position: relative;z-index: 1;}#sk-container-id-1 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-1 div.sk-item::before, #sk-container-id-1 div.sk-parallel-item::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-1 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-1 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-1 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-1 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-1 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-1 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-1 div.sk-label-container {text-align: center;}#sk-container-id-1 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-1 div.sk-text-repr-fallback {display: none;}</style><div id=\"sk-container-id-1\" class=\"sk-top-container\"><div class=\"sk-text-repr-fallback\"><pre>LogisticRegression()</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class=\"sk-container\" hidden><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-1\" type=\"checkbox\" checked><label for=\"sk-estimator-id-1\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">LogisticRegression</label><div class=\"sk-toggleable__content\"><pre>LogisticRegression()</pre></div></div></div></div></div>"
+      ],
+      "text/plain": [
+       "LogisticRegression()"
+      ]
+     },
+     "execution_count": 46,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "import pandas as pd\n",
+    "from sklearn.model_selection import train_test_split\n",
+    "from sklearn.feature_extraction.text import TfidfVectorizer\n",
+    "from sklearn.linear_model import LogisticRegression\n",
+    "from sklearn.preprocessing import LabelEncoder\n",
+    "import joblib\n",
+    "\n",
+    "# Step 1: Load your dataset\n",
+    "data = pd.read_csv(\"final_mental_health_dataset.csv\")  # ← update filename if different\n",
+    "\n",
+    "# Step 2: Preprocess\n",
+    "X = data[\"text\"]\n",
+    "y = data[\"label\"]\n",
+    "\n",
+    "# Step 3: Encode the labels\n",
+    "le = LabelEncoder()\n",
+    "y_encoded = le.fit_transform(y)\n",
+    "\n",
+    "# Step 4: TF-IDF Vectorization\n",
+    "vectorizer = TfidfVectorizer()\n",
+    "X_vectorized = vectorizer.fit_transform(X)\n",
+    "\n",
+    "# Step 5: Train model\n",
+    "model = LogisticRegression()\n",
+    "model.fit(X_vectorized, y_encoded)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 47,
+   "id": "b11ea14f",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "['label_encoder.pkl']"
+      ]
+     },
+     "execution_count": 47,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Save model\n",
+    "joblib.dump(model, \"mental_model.pkl\")\n",
+    "\n",
+    "# Save vectorizer\n",
+    "joblib.dump(vectorizer, \"mental_vectorizer.pkl\")\n",
+    "\n",
+    "# Save label encoder\n",
+    "joblib.dump(le, \"label_encoder.pkl\")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 48,
+   "id": "d5a7ac3f",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "['label_encoder.pkl']"
+      ]
+     },
+     "execution_count": 48,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "import pandas as pd\n",
+    "from sklearn.model_selection import train_test_split\n",
+    "from sklearn.feature_extraction.text import TfidfVectorizer\n",
+    "from sklearn.linear_model import LogisticRegression\n",
+    "from sklearn.preprocessing import LabelEncoder\n",
+    "import joblib\n",
+    "\n",
+    "# Load your CSV file (change the name if needed)\n",
+    "df = pd.read_csv(\"final_mental_health_dataset.csv\")  # ← file name check kar lena\n",
+    "\n",
+    "# Encode labels\n",
+    "le = LabelEncoder()\n",
+    "y = le.fit_transform(df['label'])\n",
+    "\n",
+    "# TF-IDF Vectorizer\n",
+    "vectorizer = TfidfVectorizer()\n",
+    "X = vectorizer.fit_transform(df['text'])\n",
+    "\n",
+    "# Model training\n",
+    "model = LogisticRegression()\n",
+    "model.fit(X, y)\n",
+    "\n",
+    "# ✅ Save all 3 pkl files in current folder\n",
+    "joblib.dump(model, \"mental_model.pkl\")\n",
+    "joblib.dump(vectorizer, \"mental_vectorizer.pkl\")\n",
+    "joblib.dump(le, \"label_encoder.pkl\")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "15e64cae",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.4"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
