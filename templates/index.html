@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mental Health Classifier</title>
+    <style>
+        body {
+            background-color: #f0f8ff;
+            font-family: Arial, sans-serif;
+            padding: 50px;
+            text-align: center;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            width: 250px;
+        }
+        h2 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h2>Mental Health Classifier</h2>
+    <form method="POST" action="/predict">
+        <input type="text" name="input1" placeholder="Symptom 1 (e.g. lonely)" required><br>
+        <input type="text" name="input2" placeholder="Symptom 2 (e.g. hopeless)"><br>
+        <input type="text" name="input3" placeholder="Symptom 3 (e.g. suicidal)"><br>
+        <button type="submit">Predict</button>
+    </form>
+</body>
+</html>
